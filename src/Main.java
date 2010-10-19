@@ -17,14 +17,14 @@ class Main{
 		// // SparseMultigraph<V,E> toString() method
 		System.out.println("The graph g = " + g.toString());
 		// // Note that we can use the same nodes and edges in two different graphs.
-		// Graph<Integer, String> g2 = new SparseMultigraph<Integer, String>();
-		// g2.addVertex((Integer)1);
-		// g2.addVertex((Integer)2);
-		// g2.addVertex((Integer)3);
-		// g2.addEdge("Edge-A", 1,3);
-		// g2.addEdge("Edge-B", 2,3, EdgeType.DIRECTED);
-		// g2.addEdge("Edge-C", 3, 2, EdgeType.DIRECTED);
-		// g2.addEdge("Edge-P", 2,3); // A parallel edge
-		// System.out.println("The graph g2 = " + g2.toString());
+		Graph<Integer, String> g2 = new SparseMultigraph<Integer, String>();
+		g2.addVertex((Integer)1);
+		g2.addVertex((Integer)2);
+		g2.addVertex((Integer)3);
+		g2.addEdge("Edge-A", 1,3);
+		g2.addEdge("Edge-B", 2,3, EdgeType.DIRECTED);
+		g2.addEdge("Edge-C", 3, 2, EdgeType.DIRECTED);
+		g2.addEdge("Edge-P", 2,3); // A parallel edge
+		System.out.println("The graph g2 = " + g2.toString());
 	}
 }
