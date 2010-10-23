@@ -4,6 +4,6 @@ Visualize the Ford-Fulkerson method, with two implementations, and an example us
 
 # Project Setup
 
-This project is set up with an ant build script, to build it, <pre><code>ant dist</code></pre>.  To run the generated jar, <pre><code>ant run</code></pre>
+This project is set up with an ant build script, to build it, <pre><code>ant dist</code></pre>  To run the generated jar, <pre><code>ant run</code></pre>
 
 
