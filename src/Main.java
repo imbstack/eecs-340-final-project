@@ -19,7 +19,7 @@ class Main{
 	public static void main(String[] args){
 		SimpleGraphView sgv = new SimpleGraphView(); //We create our graph in here
 		// The Layout<V, E> is parameterized by the vertex and edge types
-		Layout<EdmondsVertex, EdmondsEdge> layout = new FRLayout2(sgv.g);
+		Layout<EdmondsVertex, EdmondsEdge> layout = new ISOMLayout(sgv.g);
 		layout.setSize(new Dimension(1024,768)); // sets the initial size of the space
 		// The BasicVisualizationServer<V,E> is parameterized by the edge types
 		VisualizationViewer<EdmondsVertex, EdmondsEdge> vv =
@@ -27,20 +27,26 @@ class Main{
 		vv.setPreferredSize(new Dimension(1024,768)); //Sets the viewing area size
 		Color slate = new Color(25,25,35);
 		Transformer<EdmondsVertex,Paint> vertexPaint = new Transformer<EdmondsVertex,Paint>() {
-			public Paint transform(EdmondsVertex i) {
-				Random R = new Random();
-				Color c = new Color(R.nextInt(255), R.nextInt(255), R.nextInt(255));
-				return c;
+			public Paint transform(EdmondsVertex vert) {
+				Color orange = new Color(255,125,21);
+				return orange;
 			}
 		}; 
 		Transformer<EdmondsEdge,Paint> edgePaint = new Transformer<EdmondsEdge,Paint>() {
-			public Paint transform(EdmondsEdge i) {
+			public Paint transform(EdmondsEdge edge) {
 				return Color.white;
 			}
-		}; 
+		};
+		Transformer<EdmondsEdge, Stroke> edgeStrokeTransformer = new Transformer<EdmondsEdge, Stroke>() {
+			public Stroke transform(EdmondsEdge edge) {
+				float wid =  Math.abs(edge.getRemainingCapacity()); 
+				return new BasicStroke(wid, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f);
+			} 
+		};
 		vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
 		vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
 		vv.getRenderContext().setArrowFillPaintTransformer(edgePaint);
+		vv.getRenderContext().setEdgeStrokeTransformer(edgeStrokeTransformer);
 		vv.setBackground(slate);
 		DefaultModalGraphMouse gm = new DefaultModalGraphMouse();
 		gm.setMode(ModalGraphMouse.Mode.TRANSFORMING);
@@ -77,7 +83,7 @@ class SimpleGraphView{
 
 		edgeFact = new Factory<EdmondsEdge>(){
 			public EdmondsEdge create(){
-				return new EdmondsEdge(R.nextInt());
+				return new EdmondsEdge(R.nextInt(4));
 			}
 		};
 
