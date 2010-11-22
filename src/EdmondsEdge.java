@@ -1,11 +1,12 @@
 public class EdmondsEdge {
     public int capacity;
-    private int usedCapacity;
+    private int flow;
+    private int reverseFlow;
     private int residualCapacity;
 
     EdmondsEdge(int capacity) {
         this.capacity = capacity;
-        this.usedCapacity = 0;
+        this.flow = 0;
         this.residualCapacity = capacity;
     }
 
@@ -15,7 +16,16 @@ public class EdmondsEdge {
      * @param flow
      */
     public void setNewFlow(int flow) {
-        this.usedCapacity = flow;
+        this.flow = flow;
+        this.reverseFlow = flow;
         this.residualCapacity = this.capacity - flow;
+    }
+    public void addFlow(int flow) {
+        this.flow += flow;
+        this.reverseFlow -= flow;
+        this.residualCapacity = this.capacity - flow;
+    }
+    public int getRemainingCapacity() {
+        return residualCapacity;
     }
 }
