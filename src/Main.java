@@ -25,6 +25,23 @@ class Main{
 		VisualizationViewer<Integer,String> vv =
 			new VisualizationViewer<Integer,String>(layout);
 		vv.setPreferredSize(new Dimension(1024,768)); //Sets the viewing area size
+		Color slate = new Color(25,25,35);
+		Transformer<Integer,Paint> vertexPaint = new Transformer<Integer,Paint>() {
+			public Paint transform(Integer i) {
+				Random R = new Random();
+				Color c = new Color(R.nextInt(255), R.nextInt(255), R.nextInt(255));
+				return c;
+			}
+		}; 
+		Transformer<String,Paint> edgePaint = new Transformer<String,Paint>() {
+			public Paint transform(String i) {
+				return Color.white;
+			}
+		}; 
+		vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
+		vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
+		vv.getRenderContext().setArrowFillPaintTransformer(edgePaint);
+		vv.setBackground(slate);
 		DefaultModalGraphMouse gm = new DefaultModalGraphMouse();
 		gm.setMode(ModalGraphMouse.Mode.TRANSFORMING);
 		vv.setGraphMouse(gm); 
@@ -41,7 +58,7 @@ class Main{
 class SimpleGraphView{
 	public DirectedSparseGraph<Integer,String> g;
 	public DirectedGraph<Integer,String> ed;
-	private Transformer<String, Double> trans;
+	private Transformer<String, Integer> trans;
 	private Map<String, Double> cart;
 	private Factory<String> edgeFact;
 	private Factory<Integer> vertFact;
@@ -49,27 +66,12 @@ class SimpleGraphView{
 	//Fix the random thing soon
 	private Random R = new Random();
 	public SimpleGraphView(){
-		/*
-		   g = new DirectedSparseGraph<Integer,String>();
-
-		   g.addVertex(1);
-		   g.addVertex(2);
-		   g.addVertex(3);
-		   g.addVertex(4);
-		   g.addEdge("ONE", 1,2);
-		   g.addEdge("TWO", 1,3);
-		   g.addEdge("THREE", 2,3);
-		   g.addEdge("FOUR", 3,4);
-		   g.addEdge("FIVE", 1,4);
-		   */
-
-
 
 		cart = new HashMap<String, Double>();
 
-		trans = new Transformer<String, Double>(){
-			public Double transform(String link){
-				return 1.1;
+		trans = new Transformer<String, Integer>(){
+			public Integer transform(String link){
+				return R.nextInt();
 			}
 		};
 
