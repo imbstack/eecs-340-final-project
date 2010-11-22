@@ -19,22 +19,22 @@ class Main{
 	public static void main(String[] args){
 		SimpleGraphView sgv = new SimpleGraphView(); //We create our graph in here
 		// The Layout<V, E> is parameterized by the vertex and edge types
-		Layout<Integer, String> layout = new FRLayout2(sgv.g);
+		Layout<EdmondsVertex, EdmondsEdge> layout = new FRLayout2(sgv.g);
 		layout.setSize(new Dimension(1024,768)); // sets the initial size of the space
 		// The BasicVisualizationServer<V,E> is parameterized by the edge types
-		VisualizationViewer<Integer,String> vv =
-			new VisualizationViewer<Integer,String>(layout);
+		VisualizationViewer<EdmondsVertex, EdmondsEdge> vv =
+			new VisualizationViewer<EdmondsVertex, EdmondsEdge>(layout);
 		vv.setPreferredSize(new Dimension(1024,768)); //Sets the viewing area size
 		Color slate = new Color(25,25,35);
-		Transformer<Integer,Paint> vertexPaint = new Transformer<Integer,Paint>() {
-			public Paint transform(Integer i) {
+		Transformer<EdmondsVertex,Paint> vertexPaint = new Transformer<EdmondsVertex,Paint>() {
+			public Paint transform(EdmondsVertex i) {
 				Random R = new Random();
 				Color c = new Color(R.nextInt(255), R.nextInt(255), R.nextInt(255));
 				return c;
 			}
 		}; 
-		Transformer<String,Paint> edgePaint = new Transformer<String,Paint>() {
-			public Paint transform(String i) {
+		Transformer<EdmondsEdge,Paint> edgePaint = new Transformer<EdmondsEdge,Paint>() {
+			public Paint transform(EdmondsEdge i) {
 				return Color.white;
 			}
 		}; 
@@ -56,55 +56,55 @@ class Main{
 }
 
 class SimpleGraphView{
-	public DirectedSparseGraph<Integer,String> g;
-	public DirectedGraph<Integer,String> ed;
-	private Transformer<String, Integer> trans;
-	private Map<String, Double> cart;
-	private Factory<String> edgeFact;
-	private Factory<Integer> vertFact;
-	private Factory<DirectedGraph<Integer, String>> graphFact;
+	public DirectedSparseGraph<EdmondsVertex, EdmondsEdge> g;
+	public DirectedGraph<EdmondsVertex, EdmondsEdge> ed;
+	private Transformer<EdmondsEdge, Integer> trans;
+	private Map<EdmondsEdge, Double> cart;
+	private Factory<EdmondsEdge> edgeFact;
+	private Factory<EdmondsVertex> vertFact;
+	private Factory<DirectedGraph<EdmondsVertex, EdmondsEdge>> graphFact;
 	//Fix the random thing soon
 	private Random R = new Random();
 	public SimpleGraphView(){
 
-		cart = new HashMap<String, Double>();
+		cart = new HashMap<EdmondsEdge, Double>();
 
-		trans = new Transformer<String, Integer>(){
-			public Integer transform(String link){
-				return R.nextInt();
+		trans = new Transformer<EdmondsEdge, Integer>(){
+			public Integer transform(EdmondsEdge link){
+				return link.capacity;
 			}
 		};
 
-		edgeFact = new Factory<String>(){
-			public String create(){
-				return Integer.toString(R.nextInt());
+		edgeFact = new Factory<EdmondsEdge>(){
+			public EdmondsEdge create(){
+				return new EdmondsEdge(R.nextInt());
 			}
 		};
 
-		vertFact = new Factory<Integer>(){
-			public Integer create(){
-				return R.nextInt();
+		vertFact = new Factory<EdmondsVertex>(){
+			public EdmondsVertex create(){
+				return new EdmondsVertex();
 			}
 		};
 
-		graphFact = new Factory<DirectedGraph<Integer, String>>(){
-			public DirectedGraph<Integer, String> create(){
-				return new DirectedSparseGraph<Integer, String>();
+		graphFact = new Factory<DirectedGraph<EdmondsVertex, EdmondsEdge>>(){
+			public DirectedGraph<EdmondsVertex, EdmondsEdge> create(){
+				return new DirectedSparseGraph<EdmondsVertex, EdmondsEdge>();
 			}
 		};
 
 		EppsteinPowerLawGenerator eplg = new EppsteinPowerLawGenerator(graphFact, vertFact, edgeFact, 80, 240, 100);
 		g = (DirectedSparseGraph)eplg.create();
-		g.addVertex(1);
-		g.addVertex(2);
-		g.addEdge("ONE", 1,2);
+		//g.addVertex(new EdmondsVertex());
+		//g.addVertex(new EdmondsVertex);
+		//g.addEdge("ONE", 1,2);
 
 		//TEST EDMONDS-KARP
 
-		EdmondsKarpMaxFlow maxFlow = new EdmondsKarpMaxFlow(g, 1, 2, trans, cart, edgeFact);
-		maxFlow.evaluate();
-		ed = maxFlow.getFlowGraph();
-		System.out.println("---------------------------------------------" + maxFlow.getMaxFlow());
+		//EdmondsKarpMaxFlow maxFlow = new EdmondsKarpMaxFlow(g, 1, 2, trans, cart, edgeFact);
+		//maxFlow.evaluate();
+		//ed = maxFlow.getFlowGraph();
+		//System.out.println("---------------------------------------------" + maxFlow.getMaxFlow());
 	}
 }
 
