@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.HashSet;
+import java.util.ArrayList;
 import edu.uci.ics.jung.algorithms.generators.random.EppsteinPowerLawGenerator;
 import edu.uci.ics.jung.visualization.control.*;
 
@@ -28,7 +29,13 @@ class Main{
 		Color slate = new Color(25,25,35);
 		Transformer<EdmondsVertex,Paint> vertexPaint = new Transformer<EdmondsVertex,Paint>() {
 			public Paint transform(EdmondsVertex vert) {
-				Color orange = new Color(255,125,21);
+				Color orange = new Color(155,175,151);
+				if (vert.s){
+					return Color.green;
+				}
+				else if(vert.t){
+					return Color.red;
+				}
 				return orange;
 			}
 		}; 
@@ -83,7 +90,7 @@ class SimpleGraphView{
 
 		edgeFact = new Factory<EdmondsEdge>(){
 			public EdmondsEdge create(){
-				return new EdmondsEdge(R.nextInt(4));
+				return new EdmondsEdge(R.nextInt(4) + 1);
 			}
 		};
 
@@ -99,11 +106,26 @@ class SimpleGraphView{
 			}
 		};
 
-		EppsteinPowerLawGenerator eplg = new EppsteinPowerLawGenerator(graphFact, vertFact, edgeFact, 80, 240, 100);
+		EppsteinPowerLawGenerator eplg = new EppsteinPowerLawGenerator(graphFact, vertFact, edgeFact, 30, 50, 5);
 		g = (DirectedSparseGraph)eplg.create();
-		//g.addVertex(new EdmondsVertex());
-		//g.addVertex(new EdmondsVertex);
-		//g.addEdge("ONE", 1,2);
+
+		//Now we will randomly select a source and a sink
+		EdmondsVertex[] vertices = new EdmondsVertex[g.getVertexCount()];
+		int c = 0;
+		for(EdmondsVertex vert : g.getVertices()){
+			vertices[c++] = vert;
+		}
+		//use these for the source and sink, select out 
+		//of first half and second half to avoid selecting the same node
+		int s = R.nextInt(vertices.length/2);
+		int t = R.nextInt(vertices.length/2) + vertices.length/2;
+		vertices[s].s = true;
+		vertices[t].t = true;
+
+		//Lets now try our edmonds-karp algorithm... fingers crossed
+		EdmondsKarp ek = new EdmondsKarp(g);
+		ek.maxFlow(vertices[s], vertices[t]);	
+
 
 		//TEST EDMONDS-KARP
 
