@@ -24,16 +24,19 @@ public class EdmondsKarp {
             }
 
             // While there is a path with available capacity...
+	    System.out.println("Before");
             long capacity = findPath(source,sink);
+	    System.out.println("After");
             while (capacity != 0) {
                 // Travel backwards from the sink, adjusting the node capacities
                 //  as we go back.
                 EdmondsVertex currentV = sink;
                 while (currentV != source) {
-                    f.findEdge(currentV, currentV.parentNode).addFlow((int)capacity);
+                    f.findEdge(currentV.parentNode, currentV).addFlow((int)capacity);
                     currentV = currentV.parentNode;
                 }
                 capacity = findPath(source,sink);
+		//System.out.println(capacity);
             }
             Collection<EdmondsVertex> vertices;
             return 1;
@@ -49,6 +52,7 @@ public class EdmondsKarp {
         private long findPath(EdmondsVertex s, EdmondsVertex t) {
             // First, reset the Verticies to undiscovered
             for(EdmondsVertex i: f.getVertices()) {
+		    System.out.println("WAT");
                 i.discoveredState = -1;
                 i.parentNode = null;
             }

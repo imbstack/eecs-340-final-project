@@ -13,8 +13,9 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.HashSet;
 import java.util.ArrayList;
-import edu.uci.ics.jung.algorithms.generators.random.EppsteinPowerLawGenerator;
+import edu.uci.ics.jung.algorithms.generators.random.KleinbergSmallWorldGenerator;
 import edu.uci.ics.jung.visualization.control.*;
+import edu.uci.ics.jung.algorithms.shortestpath.UnweightedShortestPath;
 
 class Main{
 	public static void main(String[] args){
@@ -78,6 +79,8 @@ class SimpleGraphView{
 	private Factory<DirectedGraph<EdmondsVertex, EdmondsEdge>> graphFact;
 	//Fix the random thing soon
 	private Random R = new Random();
+	EdmondsVertex[] vertices;
+	int s, t;
 	public SimpleGraphView(){
 
 		cart = new HashMap<EdmondsEdge, Double>();
@@ -106,26 +109,26 @@ class SimpleGraphView{
 			}
 		};
 
-		EppsteinPowerLawGenerator eplg = new EppsteinPowerLawGenerator(graphFact, vertFact, edgeFact, 30, 50, 5);
-		g = (DirectedSparseGraph)eplg.create();
+		/*
+		g = new DirectedSparseGraph<EdmondsVertex, EdmondsEdge>();
+		EdmondsVertex a = new EdmondsVertex();
+		EdmondsVertex b = new EdmondsVertex();
+		EdmondsVertex c = new EdmondsVertex();
+		a.s = true;
+		c.t = true;
+		g.addVertex(a);
+		g.addVertex(b);
+		g.addVertex(c);
+		g.addEdge(new EdmondsEdge(1), a,b);
+		g.addEdge(new EdmondsEdge(2), b,c);
+		*/
 
-		//Now we will randomly select a source and a sink
-		EdmondsVertex[] vertices = new EdmondsVertex[g.getVertexCount()];
-		int c = 0;
-		for(EdmondsVertex vert : g.getVertices()){
-			vertices[c++] = vert;
-		}
-		//use these for the source and sink, select out 
-		//of first half and second half to avoid selecting the same node
-		int s = R.nextInt(vertices.length/2);
-		int t = R.nextInt(vertices.length/2) + vertices.length/2;
-		vertices[s].s = true;
-		vertices[t].t = true;
-
+		this.generateGraph();	
+				
 		//Lets now try our edmonds-karp algorithm... fingers crossed
 		EdmondsKarp ek = new EdmondsKarp(g);
 		ek.maxFlow(vertices[s], vertices[t]);	
-
+		
 
 		//TEST EDMONDS-KARP
 
@@ -133,6 +136,28 @@ class SimpleGraphView{
 		//maxFlow.evaluate();
 		//ed = maxFlow.getFlowGraph();
 		//System.out.println("---------------------------------------------" + maxFlow.getMaxFlow());
+	}
+
+	private void generateGraph(){
+		KleinbergSmallWorldGenerator kswg = new KleinbergSmallWorldGenerator(graphFact, vertFact, edgeFact, 3, 1.001);
+		g = (DirectedSparseGraph)kswg.create();
+		vertices = new EdmondsVertex[g.getVertexCount()];
+		int c = 0;
+		for(EdmondsVertex vert : g.getVertices()){
+			vertices[c++] = vert;
+		}
+		//use these for the source and sink, select out 
+		//of first half and second half to avoid selecting the same node
+		s = R.nextInt(vertices.length/2);
+		t = R.nextInt(vertices.length/2) + vertices.length/2;
+		vertices[s].s = true;
+		vertices[t].t = true;
+
+		UnweightedShortestPath<EdmondsVertex,EdmondsEdge> chkPath = new UnweightedShortestPath<EdmondsVertex,EdmondsEdge>(g);
+		if (chkPath.getDistance(vertices[s], vertices[t]) == null){
+			this.generateGraph();
+		}
+		return;
 	}
 }
 
