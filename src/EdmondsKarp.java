@@ -1,8 +1,10 @@
 import edu.uci.ics.jung.graph.*;
 import edu.uci.ics.jung.graph.util.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.LinkedList;
 
 public class EdmondsKarp {
 
@@ -17,32 +19,65 @@ public class EdmondsKarp {
 	}
 
         public int maxFlow(EdmondsVertex source, EdmondsVertex sink) {
-            int flow = 0;
-            Collection<EdmondsEdge> edges = f.getEdges();
-            // Sets the initial flow to zero for all edges
-            Iterator<EdmondsEdge> i = edges.iterator();
-            while (i.hasNext()) {
-                i.next().setNewFlow(0);
+            for (EdmondsEdge i: f.getEdges()) {
+                i.setNewFlow(0);
             }
 
-            EdmondsEdge[] path = findPath(source,sink);
-            while (path.length != 0) {
-                for( int j = 0; j < path.length; j++) {
-                    
+            // While there is a path with available capacity...
+	    System.out.println("Before");
+            long capacity = findPath(source,sink);
+	    System.out.println("After");
+            while (capacity != 0) {
+                // Travel backwards from the sink, adjusting the node capacities
+                //  as we go back.
+                EdmondsVertex currentV = sink;
+                while (currentV != source) {
+                    f.findEdge(currentV.parentNode, currentV).addFlow((int)capacity);
+                    currentV = currentV.parentNode;
                 }
-                path = findPath(source,sink);
+                capacity = findPath(source,sink);
+		//System.out.println(capacity);
             }
             Collection<EdmondsVertex> vertices;
             return 1;
         }
         /**
          * Finds a path with remaining capacity between s and t.
-         * Returns an empty array of EdmondsEdges if there is no remaining capacity.
+         * Returns the capacity of the path it has found. Also, this method
+         * stores the path in the EdmondsVertex instances so it is possible
+         * to work backwards using EdmondsVertex.parentNode from the sink.
          * @param s Source node
          * @param t Destination node
          */
-        private EdmondsEdge[] findPath(EdmondsVertex s, EdmondsVertex t) {
+        private long findPath(EdmondsVertex s, EdmondsVertex t) {
+            // First, reset the Verticies to undiscovered
+            for(EdmondsVertex i: f.getVertices()) {
+		    System.out.println("WAT");
+                i.discoveredState = -1;
+                i.parentNode = null;
+            }
+            s.discoveredState = -2;
+            // Use a LinkedList as a Queue for finding verticies
+            LinkedList<EdmondsVertex> discoveredV = new LinkedList<EdmondsVertex>();
+            // Keep an array of distances from the source
+            discoveredV.add(s);
 
+            while (discoveredV.size() > 0) {
+                EdmondsVertex currentV = discoveredV.removeFirst();
+                for (EdmondsVertex adjV: f.getNeighbors(currentV)) {
+                    EdmondsEdge connection = f.findEdge(currentV, adjV);
+                    if (adjV.discoveredState == -1 && (connection.getRemainingCapacity() > 0)) {
+                        adjV.parentNode = currentV;
+                        adjV.pathCapacityToNode = Math.min(currentV.pathCapacityToNode, connection.getRemainingCapacity());
+                        if (adjV != t) {
+                            discoveredV.add(adjV);
+                        } else {
+                            return adjV.pathCapacityToNode;
+                        }
+                    }
+                }
+            }
+            return 0;
         }
         //private int capacity(EdmondsVertex a, EdmondsVertex b) {
 
