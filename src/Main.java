@@ -148,6 +148,7 @@ class SimpleGraphView{
 		}
 		//use these for the source and sink, select out 
 		//of first half and second half to avoid selecting the same node
+		//wgttt
 		s = R.nextInt(vertices.length/2);
 		t = R.nextInt(vertices.length/2) + vertices.length/2;
 		vertices[s].s = true;

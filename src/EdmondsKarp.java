@@ -60,6 +60,7 @@ public class EdmondsKarp {
             // Use a LinkedList as a Queue for finding verticies
             LinkedList<EdmondsVertex> discoveredV = new LinkedList<EdmondsVertex>();
             // Keep an array of distances from the source
+	    //
             discoveredV.add(s);
 
             while (discoveredV.size() > 0) {
