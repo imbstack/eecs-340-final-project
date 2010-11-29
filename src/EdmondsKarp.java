@@ -24,9 +24,8 @@ public class EdmondsKarp {
             }
 
             // While there is a path with available capacity...
-	    System.out.println("Before");
             long capacity = findPath(source,sink);
-	    System.out.println("After");
+            System.out.println("Found path of capacity " + capacity + ". It's " + returnPath(sink));
             while (capacity != 0) {
                 // Travel backwards from the sink, adjusting the node capacities
                 //  as we go back.
@@ -36,6 +35,7 @@ public class EdmondsKarp {
                     currentV = currentV.parentNode;
                 }
                 capacity = findPath(source,sink);
+                System.out.println("Found path of capacity " + capacity + ". It's " + returnPath(sink));
 		//System.out.println(capacity);
             }
             Collection<EdmondsVertex> vertices;
@@ -52,7 +52,6 @@ public class EdmondsKarp {
         private long findPath(EdmondsVertex s, EdmondsVertex t) {
             // First, reset the Verticies to undiscovered
             for(EdmondsVertex i: f.getVertices()) {
-		    System.out.println("WAT");
                 i.discoveredState = -1;
                 i.parentNode = null;
             }
@@ -65,10 +64,11 @@ public class EdmondsKarp {
 
             while (discoveredV.size() > 0) {
                 EdmondsVertex currentV = discoveredV.removeFirst();
-                for (EdmondsVertex adjV: f.getNeighbors(currentV)) {
+                for (EdmondsVertex adjV: f.getSuccessors(currentV)) {
                     EdmondsEdge connection = f.findEdge(currentV, adjV);
                     if (adjV.discoveredState == -1 && (connection.getRemainingCapacity() > 0)) {
                         adjV.parentNode = currentV;
+                        adjV.discoveredState = 1; // To prevent cycles
                         adjV.pathCapacityToNode = Math.min(currentV.pathCapacityToNode, connection.getRemainingCapacity());
                         if (adjV != t) {
                             discoveredV.add(adjV);
@@ -79,6 +79,18 @@ public class EdmondsKarp {
                 }
             }
             return 0;
+        }
+        // Follows the path of pointers of parentNode and prints the 
+        //  name of each node along the way.
+        // If you pass this a null reference, I will hunt you down.
+        public String returnPath(EdmondsVertex dest) {
+            String end = new String();
+            EdmondsVertex current = dest;
+            while (current != null) {
+                end = current.name + end;
+                current = current.parentNode;
+            }
+            return end;
         }
         //private int capacity(EdmondsVertex a, EdmondsVertex b) {
 

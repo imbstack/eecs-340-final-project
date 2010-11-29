@@ -1,4 +1,5 @@
 public class EdmondsVertex {
+    String name; // For debugging purposes
     int discoveredState;
     EdmondsVertex parentNode;
     long pathCapacityToNode;
@@ -14,5 +15,17 @@ public class EdmondsVertex {
         this.pathCapacityToNode = 4294967296L; // = max int + 1 (roughly equal to infinity)
 	this.s = false;
 	this.t = false;
+    }
+    EdmondsVertex(String name) {
+        this();
+        this.name = name;
+    }
+    boolean hasParentNode(EdmondsVertex p) {
+        EdmondsVertex parent = parentNode;
+        while(parent != null) {
+            if (parent == p)
+                return true;
+        }
+        return false;
     }
 }
