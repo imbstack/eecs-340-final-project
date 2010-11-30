@@ -19,6 +19,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import edu.uci.ics.jung.algorithms.filters.EdgePredicateFilter;
+import org.apache.commons.collections15.Predicate;
 
 class Main{
 	static SimpleGraphView sgv;
@@ -87,16 +89,16 @@ class Main{
 	}
 	static class ControlPanel extends JPanel {
 		JButton maxFlow;
-		JButton beginMaxFlow;
+		JButton reset;
 		JButton step;
 		JButton newGraph;
 		JSlider graphSize;
 		ControlPanel() {
 			maxFlow = new JButton("Compute Max Flow");
-			beginMaxFlow = new JButton("Begin Animation");
+			reset = new JButton("Reset");
 			step = new JButton("Step");
 			newGraph = new JButton("New Random Graph");
-			graphSize = new JSlider(2, 6, graphDims);
+			graphSize = new JSlider(2, 10, graphDims);
 
 			maxFlow.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -106,9 +108,8 @@ class Main{
 				}
 			});
 
-			beginMaxFlow.addActionListener(new ActionListener() {
+			reset.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					// Do stuff, but slower
 					//sgv.performEdmondsKarp();
 				}
 			});
@@ -141,7 +142,7 @@ class Main{
 
 			this.setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
 			this.add(maxFlow);
-			this.add(beginMaxFlow);
+			this.add(reset);
 			this.add(step);
 			this.add(newGraph);
 			this.add(graphSize);
@@ -199,6 +200,19 @@ class SimpleGraphView{
 	private void generateGraph(){
 		Lattice2DGenerator kswg = new Lattice2DGenerator(graphFact, vertFact, edgeFact, Main.getDims(), false);
 		g = (DirectedSparseGraph)kswg.create();
+
+
+		Predicate<EdmondsEdge> selRandom = new Predicate<EdmondsEdge>(){
+			public boolean evaluate(EdmondsEdge edge){
+				if (R.nextFloat() > 0.85){
+					return false;
+				}
+				return true;
+			}
+		};
+		EdgePredicateFilter<EdmondsVertex, EdmondsEdge> edgeFilter = new EdgePredicateFilter<EdmondsVertex, EdmondsEdge>(selRandom);
+		g = (DirectedSparseGraph)edgeFilter.transform(g);
+
 		vertices = new EdmondsVertex[g.getVertexCount()];
 		int c = 0;
 		for(EdmondsVertex vert : g.getVertices()){
