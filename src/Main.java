@@ -21,6 +21,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import edu.uci.ics.jung.algorithms.filters.EdgePredicateFilter;
 import org.apache.commons.collections15.Predicate;
+import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 
 class Main{
 	static SimpleGraphView sgv;
@@ -64,18 +65,18 @@ class Main{
 		};
 		Transformer<EdmondsEdge,Paint> edgePaint = new Transformer<EdmondsEdge,Paint>() {
 			public Paint transform(EdmondsEdge edge) {
-                if (edge.getFlow() == 0) {
-                    return new Color(100,100,100);
-                }
+				if (edge.getFlow() == 0) {
+					return new Color(100,100,100);
+				}
 				return new Color(50,50,50+(int)(205*((double)edge.getFlow()/EdmondsEdge.maxUsed)));
 			}
 		};
-        Transformer<EdmondsEdge,Font> edgeFont = new Transformer<EdmondsEdge,Font>() {
+		Transformer<EdmondsEdge,Font> edgeFont = new Transformer<EdmondsEdge,Font>() {
 			public Font transform(EdmondsEdge edge) {
-				return new Font("serif", Font.BOLD, 20);
+				return new Font("sans", Font.TRUETYPE_FONT, 20);
 			}
 		};
-        Transformer<EdmondsVertex,Font> vertexFont = new Transformer<EdmondsVertex,Font>() {
+		Transformer<EdmondsVertex,Font> vertexFont = new Transformer<EdmondsVertex,Font>() {
 			public Font transform(EdmondsVertex edge) {
 				return new Font("sans", Font.BOLD, 12);
 			}
@@ -88,19 +89,21 @@ class Main{
 		};
 		vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
 		vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
-        vv.getRenderContext().setEdgeFontTransformer(edgeFont);
-        vv.getRenderContext().setVertexFontTransformer(vertexFont);
+		vv.getRenderContext().setEdgeFontTransformer(edgeFont);
+		vv.getRenderContext().setVertexFontTransformer(vertexFont);
 		vv.getRenderContext().setArrowFillPaintTransformer(edgePaint);
 		vv.getRenderContext().setEdgeStrokeTransformer(edgeStrokeTransformer);
 		vv.setForeground(Color.WHITE);
 		vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller());
+		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
+		//vv.getRenderer().getVertexLabelRenderer().setForeground(Color.black);
 		vv.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
 		vv.setBackground(slate);
 		DefaultModalGraphMouse gm = new DefaultModalGraphMouse();
 		gm.setMode(ModalGraphMouse.Mode.TRANSFORMING);
 		vv.setGraphMouse(gm);
-        vv.revalidate();
-        vv.repaint();
+		vv.revalidate();
+		vv.repaint();
 	}
 	static class ControlPanel extends JPanel {
 		JButton maxFlow;
@@ -137,11 +140,11 @@ class Main{
 			newGraph.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					//sgv.generateNewGraph();
-                    frame.setVisible(false);
-                    frame.getContentPane().remove(vv);
+					frame.setVisible(false);
+					frame.getContentPane().remove(vv);
 					renderGraph();
-                    frame.getContentPane().add(vv);
-                    frame.setVisible(true);
+					frame.getContentPane().add(vv);
+					frame.setVisible(true);
 					//layout = new ISOMLayout(sgv.g);
 					//vv = new VisualizationViewer<EdmondsVertex, EdmondsEdge>(layout);
 					//vv.update(frame.getGraphics());
@@ -246,6 +249,7 @@ class SimpleGraphView{
 		if (chkPath.getDistance(vertices[s], vertices[t]) == null){
 			this.generateGraph();
 		}
+		EdmondsEdge.maxUsed = 0;
 		return;
 	}
 	public void generateNewGraph() {
