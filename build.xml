@@ -49,10 +49,19 @@
   <target name="compile" depends="init"
         description="compile the source " >
     <!-- Compile the java code from ${src} into ${build} -->
-    <javac srcdir="${src}" destdir="${build}" classpathref="classpath" includeantruntime="false">
+    <javac srcdir="${src}" destdir="${build}" classpathref="classpath" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
 	    <compilerarg value="-Xlint:none"/> 
     </javac>
   </target>
+
+<target name="compile_w_debug" depends="init"
+        description="compile the source " >
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac srcdir="${src}" destdir="${build}" classpathref="classpath" includeantruntime="false">
+	    <compilerarg value="-Xlint:none -g"/> 
+    </javac>
+  </target>
+
 
   <target name="dist" depends="compile"
         description="generate the distribution" >

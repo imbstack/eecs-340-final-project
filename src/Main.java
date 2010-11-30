@@ -17,13 +17,17 @@ import edu.uci.ics.jung.algorithms.shortestpath.UnweightedShortestPath;
 import edu.uci.ics.jung.visualization.decorators.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 class Main{
 	static SimpleGraphView sgv;
 	static Layout<EdmondsVertex, EdmondsEdge> layout;
 	static VisualizationViewer<EdmondsVertex, EdmondsEdge> vv;
 	static JFrame frame;
+	static int graphDims;
 	public static void main(String[] args){
+		graphDims = 3;
 		frame = new JFrame("Simple Graph View");
 		ControlPanel controls = new ControlPanel();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -86,15 +90,19 @@ class Main{
 		JButton beginMaxFlow;
 		JButton step;
 		JButton newGraph;
+		JSlider graphSize;
 		ControlPanel() {
 			maxFlow = new JButton("Compute Max Flow");
 			beginMaxFlow = new JButton("Begin Animation");
 			step = new JButton("Step");
 			newGraph = new JButton("New Random Graph");
+			graphSize = new JSlider(2, 6, graphDims);
 
 			maxFlow.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					sgv.performEdmondsKarp();
+					//vv.update(frame.getGraphics());
+					vv.repaint();
 				}
 			});
 
@@ -106,7 +114,8 @@ class Main{
 			});
 			step.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					//sgv.performEdmondsStep();
+					sgv.performEdmondsStep();
+					vv.repaint();
 				}
 			});
 			newGraph.addActionListener(new ActionListener() {
@@ -123,13 +132,24 @@ class Main{
 					//renderGraph();
 				}
 			});
+			graphSize.setSnapToTicks(true);
+			graphSize.addChangeListener(new ChangeListener(){
+				public void stateChanged(ChangeEvent e){
+					graphDims = graphSize.getValue();	
+				}
+			});
 
 			this.setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
 			this.add(maxFlow);
 			this.add(beginMaxFlow);
 			this.add(step);
 			this.add(newGraph);
+			this.add(graphSize);
 		}
+	}
+
+	public static int getDims(){
+		return graphDims;
 	}
 }
 
@@ -141,10 +161,10 @@ class SimpleGraphView{
 	private Factory<EdmondsEdge> edgeFact;
 	private Factory<EdmondsVertex> vertFact;
 	private Factory<DirectedGraph<EdmondsVertex, EdmondsEdge>> graphFact;
-	//Fix the random thing soon
 	private Random R = new Random();
 	EdmondsVertex[] vertices;
 	int s, t;
+	private EdmondsKarp ek;
 	public SimpleGraphView(){
 
 		cart = new HashMap<EdmondsEdge, Double>();
@@ -177,7 +197,7 @@ class SimpleGraphView{
 	}
 
 	private void generateGraph(){
-		Lattice2DGenerator kswg = new Lattice2DGenerator(graphFact, vertFact, edgeFact, 3, false);
+		Lattice2DGenerator kswg = new Lattice2DGenerator(graphFact, vertFact, edgeFact, Main.getDims(), false);
 		g = (DirectedSparseGraph)kswg.create();
 		vertices = new EdmondsVertex[g.getVertexCount()];
 		int c = 0;
@@ -187,6 +207,7 @@ class SimpleGraphView{
 		}
 		//use these for the source and sink, select out 
 		//of first half and second half to avoid selecting the same node
+		//wgttt
 		s = R.nextInt(vertices.length/2);
 		t = R.nextInt(vertices.length/2) + vertices.length/2;
 		vertices[s].s = true;
@@ -203,7 +224,14 @@ class SimpleGraphView{
 	}
 	public void performEdmondsKarp() {
 		//Lets now try our edmonds-karp algorithm... fingers crossed
-		EdmondsKarp ek = new EdmondsKarp(g);
-		ek.maxFlow(vertices[s], vertices[t]);
+		ek = new EdmondsKarp(g);
+		ek.maxFlow(vertices[s], vertices[t], true);
+	}
+
+	public void performEdmondsStep() {
+		if (ek == null){
+			ek = new EdmondsKarp(g);
+		}
+		ek.maxFlow(vertices[s], vertices[t], false);
 	}
 }
