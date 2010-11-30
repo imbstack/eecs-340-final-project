@@ -36,7 +36,12 @@ public class EdmondsKarp {
 					currentV = currentV.parentNode;
 				}
 				capacity = findPath(source,sink);
-				System.out.println("Found path of capacity " + capacity + ". It's " + returnPath(sink));
+				if (capacity > 0){
+					System.out.println("Found path of capacity " + capacity + ". It's " + returnPath(sink));
+				}
+				else{
+					System.out.println("Finished");
+				}
 				//System.out.println(capacity);
 			}
 		}
@@ -48,7 +53,12 @@ public class EdmondsKarp {
 					currentV = currentV.parentNode;
 				}
 				capacity = findPath(source,sink);
-				System.out.println("Found path of capacity " + capacity + ". It's " + returnPath(sink));
+				if (capacity > 0){
+					System.out.println("Found path of capacity " + capacity + ". It's " + returnPath(sink));
+				}
+				else{
+					System.out.println("Finished");
+				}
 				//System.out.println(capacity);
 			}
 		}
@@ -98,13 +108,18 @@ public class EdmondsKarp {
 	//  name of each node along the way.
 	// If you pass this a null reference, I will hunt you down.
 	public String returnPath(EdmondsVertex dest) {
-		String end = new String();
+		String end = "";
 		EdmondsVertex current = dest;
 		while (current != null) {
-			end = current.name + end;
-			current = current.parentNode;
+			if (end == ""){
+				end = current.name + "}";
+			}
+			else{
+				end = current.name + " → " + end;
+			}
+				current = current.parentNode;
 		}
-		return end;
+		return "{" + end;
 	}
 	//private int capacity(EdmondsVertex a, EdmondsVertex b) {
 
