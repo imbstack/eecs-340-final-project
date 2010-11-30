@@ -21,8 +21,6 @@ public class EdmondsKarp {
 	}
 
 	public int maxFlow(EdmondsVertex source, EdmondsVertex sink, boolean runFull) {
-
-
 		// While there is a path with available capacity...
 		capacity = findPath(source,sink);
 		System.out.println("Found path of capacity " + capacity + ". It's " + returnPath(sink));
