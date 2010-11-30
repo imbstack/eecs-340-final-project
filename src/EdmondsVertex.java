@@ -11,6 +11,7 @@ public class EdmondsVertex {
     EdmondsVertex() {
 	numNodes += 1;
 	this.id = numNodes;
+        this.name = Integer.toString(this.id);
         this.discoveredState = -1; // undiscovered
         this.pathCapacityToNode = 4294967296L; // = max int + 1 (roughly equal to infinity)
 	this.s = false;
@@ -27,5 +28,9 @@ public class EdmondsVertex {
                 return true;
         }
         return false;
+    }
+
+    public String toString(){
+        return this.name;
     }
 }
