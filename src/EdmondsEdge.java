@@ -20,14 +20,12 @@ public class EdmondsEdge {
      */
     public void setNewFlow(int flow) {
         this.flow = flow;
-        this.reverseFlow = flow;
         this.residualCapacity = this.capacity - flow;
         maxUsed = Math.max(maxUsed, this.flow);
     }
     public void addFlow(int flow) {
         this.flow += flow;
-        this.reverseFlow -= flow;
-        this.residualCapacity = this.capacity - flow;
+        this.residualCapacity = this.capacity - this.flow;
         maxUsed = Math.max(maxUsed, this.flow);
     }
     public int getRemainingCapacity() {
