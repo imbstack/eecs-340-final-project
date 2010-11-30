@@ -64,7 +64,20 @@ class Main{
 		};
 		Transformer<EdmondsEdge,Paint> edgePaint = new Transformer<EdmondsEdge,Paint>() {
 			public Paint transform(EdmondsEdge edge) {
-				return new Color(210-(int)(210*((double)edge.getFlow()/EdmondsEdge.maxUsed)),210,210);
+                if (edge.getFlow() == 0) {
+                    return new Color(100,100,100);
+                }
+				return new Color(50,50,50+(int)(205*((double)edge.getFlow()/EdmondsEdge.maxUsed)));
+			}
+		};
+        Transformer<EdmondsEdge,Font> edgeFont = new Transformer<EdmondsEdge,Font>() {
+			public Font transform(EdmondsEdge edge) {
+				return new Font("serif", Font.BOLD, 20);
+			}
+		};
+        Transformer<EdmondsVertex,Font> vertexFont = new Transformer<EdmondsVertex,Font>() {
+			public Font transform(EdmondsVertex edge) {
+				return new Font("sans", Font.BOLD, 12);
 			}
 		};
 		Transformer<EdmondsEdge, Stroke> edgeStrokeTransformer = new Transformer<EdmondsEdge, Stroke>() {
@@ -75,6 +88,8 @@ class Main{
 		};
 		vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
 		vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
+        vv.getRenderContext().setEdgeFontTransformer(edgeFont);
+        vv.getRenderContext().setVertexFontTransformer(vertexFont);
 		vv.getRenderContext().setArrowFillPaintTransformer(edgePaint);
 		vv.getRenderContext().setEdgeStrokeTransformer(edgeStrokeTransformer);
 		vv.setForeground(Color.WHITE);
