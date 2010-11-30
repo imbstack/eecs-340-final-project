@@ -19,6 +19,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import edu.uci.ics.jung.algorithms.filters.EdgePredicateFilter;
+import org.apache.commons.collections15.Predicate;
+import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 
 class Main{
 	static SimpleGraphView sgv;
@@ -62,18 +65,18 @@ class Main{
 		};
 		Transformer<EdmondsEdge,Paint> edgePaint = new Transformer<EdmondsEdge,Paint>() {
 			public Paint transform(EdmondsEdge edge) {
-                if (edge.getFlow() == 0) {
-                    return new Color(100,100,100);
-                }
+				if (edge.getFlow() == 0) {
+					return new Color(100,100,100);
+				}
 				return new Color(50,50,50+(int)(205*((double)edge.getFlow()/EdmondsEdge.maxUsed)));
 			}
 		};
-        Transformer<EdmondsEdge,Font> edgeFont = new Transformer<EdmondsEdge,Font>() {
+		Transformer<EdmondsEdge,Font> edgeFont = new Transformer<EdmondsEdge,Font>() {
 			public Font transform(EdmondsEdge edge) {
-				return new Font("serif", Font.BOLD, 20);
+				return new Font("sans", Font.TRUETYPE_FONT, 20);
 			}
 		};
-        Transformer<EdmondsVertex,Font> vertexFont = new Transformer<EdmondsVertex,Font>() {
+		Transformer<EdmondsVertex,Font> vertexFont = new Transformer<EdmondsVertex,Font>() {
 			public Font transform(EdmondsVertex edge) {
 				return new Font("sans", Font.BOLD, 12);
 			}
@@ -86,32 +89,34 @@ class Main{
 		};
 		vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
 		vv.getRenderContext().setEdgeDrawPaintTransformer(edgePaint);
-        vv.getRenderContext().setEdgeFontTransformer(edgeFont);
-        vv.getRenderContext().setVertexFontTransformer(vertexFont);
+		vv.getRenderContext().setEdgeFontTransformer(edgeFont);
+		vv.getRenderContext().setVertexFontTransformer(vertexFont);
 		vv.getRenderContext().setArrowFillPaintTransformer(edgePaint);
 		vv.getRenderContext().setEdgeStrokeTransformer(edgeStrokeTransformer);
 		vv.setForeground(Color.WHITE);
 		vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller());
+		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
+		//vv.getRenderer().getVertexLabelRenderer().setForeground(Color.black);
 		vv.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
 		vv.setBackground(slate);
 		DefaultModalGraphMouse gm = new DefaultModalGraphMouse();
 		gm.setMode(ModalGraphMouse.Mode.TRANSFORMING);
 		vv.setGraphMouse(gm);
-        vv.revalidate();
-        vv.repaint();
+		vv.revalidate();
+		vv.repaint();
 	}
 	static class ControlPanel extends JPanel {
 		JButton maxFlow;
-		JButton beginMaxFlow;
+		JButton reset;
 		JButton step;
 		JButton newGraph;
 		JSlider graphSize;
 		ControlPanel() {
 			maxFlow = new JButton("Compute Max Flow");
-			beginMaxFlow = new JButton("Begin Animation");
+			reset = new JButton("Reset");
 			step = new JButton("Step");
 			newGraph = new JButton("New Random Graph");
-			graphSize = new JSlider(2, 6, graphDims);
+			graphSize = new JSlider(2, 10, graphDims);
 
 			maxFlow.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -121,9 +126,8 @@ class Main{
 				}
 			});
 
-			beginMaxFlow.addActionListener(new ActionListener() {
+			reset.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					// Do stuff, but slower
 					//sgv.performEdmondsKarp();
 				}
 			});
@@ -136,11 +140,11 @@ class Main{
 			newGraph.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					//sgv.generateNewGraph();
-                    frame.setVisible(false);
-                    frame.getContentPane().remove(vv);
+					frame.setVisible(false);
+					frame.getContentPane().remove(vv);
 					renderGraph();
-                    frame.getContentPane().add(vv);
-                    frame.setVisible(true);
+					frame.getContentPane().add(vv);
+					frame.setVisible(true);
 					//layout = new ISOMLayout(sgv.g);
 					//vv = new VisualizationViewer<EdmondsVertex, EdmondsEdge>(layout);
 					//vv.update(frame.getGraphics());
@@ -156,7 +160,7 @@ class Main{
 
 			this.setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
 			this.add(maxFlow);
-			this.add(beginMaxFlow);
+			this.add(reset);
 			this.add(step);
 			this.add(newGraph);
 			this.add(graphSize);
@@ -214,6 +218,19 @@ class SimpleGraphView{
 	private void generateGraph(){
 		Lattice2DGenerator kswg = new Lattice2DGenerator(graphFact, vertFact, edgeFact, Main.getDims(), false);
 		g = (DirectedSparseGraph)kswg.create();
+
+
+		Predicate<EdmondsEdge> selRandom = new Predicate<EdmondsEdge>(){
+			public boolean evaluate(EdmondsEdge edge){
+				if (R.nextFloat() > 0.85){
+					return false;
+				}
+				return true;
+			}
+		};
+		EdgePredicateFilter<EdmondsVertex, EdmondsEdge> edgeFilter = new EdgePredicateFilter<EdmondsVertex, EdmondsEdge>(selRandom);
+		g = (DirectedSparseGraph)edgeFilter.transform(g);
+
 		vertices = new EdmondsVertex[g.getVertexCount()];
 		int c = 0;
 		for(EdmondsVertex vert : g.getVertices()){
@@ -232,6 +249,7 @@ class SimpleGraphView{
 		if (chkPath.getDistance(vertices[s], vertices[t]) == null){
 			this.generateGraph();
 		}
+		EdmondsEdge.maxUsed = 0;
 		return;
 	}
 	public void generateNewGraph() {
