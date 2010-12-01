@@ -29,22 +29,30 @@ class Main{
 	static VisualizationViewer<EdmondsVertex, EdmondsEdge> vv;
 	static JFrame frame;
 	static int graphDims;
+	static long time;
 	public static void main(String[] args){
 		if ( args.length > 0 && args[0].equals("test")){
 			System.out.println("Begin Tests:");
+			for (int i = 2; i <= 256; i++){
+				graphDims = i;
+				sgv = new SimpleGraphView(true);
+				time = System.currentTimeMillis();
+				sgv.performEdmondsKarp(true);
+				System.out.println(Integer.toString(i*i) + ": "  + Long.toString(System.currentTimeMillis() - time));
+			}
 		}
 		else{
-		graphDims = 3;
-		frame = new JFrame("Simple Graph View");
-		ControlPanel controls = new ControlPanel();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.PAGE_AXIS));
-		frame.getContentPane().add(controls);
-		renderGraph();
-		frame.getContentPane().add(vv);
-		frame.pack();
-		frame.setLocation(200,200);
-		frame.setVisible(true);
+			graphDims = 3;
+			frame = new JFrame("Simple Graph View");
+			ControlPanel controls = new ControlPanel();
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.PAGE_AXIS));
+			frame.getContentPane().add(controls);
+			renderGraph();
+			frame.getContentPane().add(vv);
+			frame.pack();
+			frame.setLocation(200,200);
+			frame.setVisible(true);
 		}
 	}
 	public static void renderGraph() {
@@ -189,7 +197,12 @@ class SimpleGraphView{
 	EdmondsVertex[] vertices;
 	int s, t;
 	private EdmondsKarp ek;
+
 	public SimpleGraphView(){
+		this(false);
+	}
+
+	public SimpleGraphView(boolean isTest){
 
 		cart = new HashMap<EdmondsEdge, Double>();
 
@@ -217,25 +230,29 @@ class SimpleGraphView{
 			}
 		};
 
-		this.generateGraph();
+		this.generateGraph(isTest);
 	}
 
 	private void generateGraph(){
+		this.generateGraph(false);
+	}
+
+	private void generateGraph(boolean isTest){
 		Lattice2DGenerator kswg = new Lattice2DGenerator(graphFact, vertFact, edgeFact, Main.getDims(), false);
 		g = (DirectedSparseGraph)kswg.create();
 
-
-		Predicate<EdmondsEdge> selRandom = new Predicate<EdmondsEdge>(){
-			public boolean evaluate(EdmondsEdge edge){
-				if (R.nextFloat() > 0.85){
-					return false;
+		if (isTest){
+			Predicate<EdmondsEdge> selRandom = new Predicate<EdmondsEdge>(){
+				public boolean evaluate(EdmondsEdge edge){
+					if (R.nextFloat() > 0.85){
+						return false;
+					}
+					return true;
 				}
-				return true;
-			}
-		};
-		EdgePredicateFilter<EdmondsVertex, EdmondsEdge> edgeFilter = new EdgePredicateFilter<EdmondsVertex, EdmondsEdge>(selRandom);
-		g = (DirectedSparseGraph)edgeFilter.transform(g);
-
+			};
+			EdgePredicateFilter<EdmondsVertex, EdmondsEdge> edgeFilter = new EdgePredicateFilter<EdmondsVertex, EdmondsEdge>(selRandom);
+			g = (DirectedSparseGraph)edgeFilter.transform(g);
+		}
 		vertices = new EdmondsVertex[g.getVertexCount()];
 		int c = 0;
 		for(EdmondsVertex vert : g.getVertices()){
@@ -260,9 +277,14 @@ class SimpleGraphView{
 	public void generateNewGraph() {
 		this.generateGraph();
 	}
-	public void performEdmondsKarp() {
+
+	public void performEdmondsKarp(){
+		this.performEdmondsKarp(false);
+	}
+
+	public void performEdmondsKarp(boolean isTest) {
 		//Lets now try our edmonds-karp algorithm... fingers crossed
-		ek = new EdmondsKarp(g);
+		ek = new EdmondsKarp(g, isTest);
 		ek.maxFlow(vertices[s], vertices[t], true);
 	}
 

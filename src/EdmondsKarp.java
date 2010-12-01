@@ -12,8 +12,14 @@ public class EdmondsKarp {
 	long capacity;
 	DirectedSparseGraph<EdmondsVertex,EdmondsEdge> f;
 	EdmondsVertex source, sink;
+	boolean isTest;
 
 	EdmondsKarp(DirectedSparseGraph<EdmondsVertex, EdmondsEdge> f) {
+		this(f, false);
+	}
+
+	EdmondsKarp(DirectedSparseGraph<EdmondsVertex, EdmondsEdge> f, boolean isTest) {
+		this.isTest = isTest;
 		this.f = f;
 		for (EdmondsEdge i: f.getEdges()) {
 			i.setNewFlow(0);
