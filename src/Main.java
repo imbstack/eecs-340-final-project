@@ -39,7 +39,7 @@ class Main{
 	public static void main(String[] args){
 		if ( args.length > 0 && args[0].equals("test")){
 			System.out.println("Begin Tests:");
-			for (int i = 2; i <= 256; i++){
+			for (int i = 2; i <= 256; i+=2){
 				for (int j = 0; j < 10; j++){
 					graphDims = i;
 					sgv = new SimpleGraphView(true);
@@ -386,16 +386,6 @@ class SimpleGraphView{
 		}
 		ek.maxFlow(vertices[s], vertices[t], false);
 		Main.pd.takeStep(ek.returnPath(vertices[t]), (int)ek.capacity);
-	}
-	public void reset() {
-		for(EdmondsEdge oneEdge: g.getEdges()) {
-			oneEdge.setNewFlow(0);
-		}
-		for(EdmondsVertex oneVertex: g.getVertices()) {
-			oneVertex.parentNode = null;
-			oneVertex.pathCapacityToNode = 4294967296L;
-		}
-		EdmondsEdge.maxUsed = 0;
 	}
     public void reset() {
         for(EdmondsEdge oneEdge: g.getEdges()) {

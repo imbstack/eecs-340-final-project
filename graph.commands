@@ -1,0 +1,4 @@
+set term post landscape  "Times-Roman" 12 dashlength 1
+set grid
+plot  "parsedData.txt"  with errorbars, \
+	0.000000003*x**2.6 axis x1y1
