@@ -1,6 +1,6 @@
 # About this Project
 
-Visualize the Ford-Fulkerson method, with two implementations, and an example using the _water system?_
+Final project for EECS 340 at CWRU by Tom Dooner and Brian Stack.  
 
 # Project Setup
 

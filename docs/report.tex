@@ -1,0 +1,34 @@
+\documentclass[letterpaper]{report}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{fancyhdr}
+\renewcommand{\labelenumi}{\alph{enumi})}
+\newcommand{\field}[1]{\mathbb{#1}}
+\usepackage{fullpage}
+\usepackage{clrscode3e}
+\usepackage[usenames,dvipsnames]{pstricks}
+\usepackage{epsfig}
+\usepackage{pst-grad} % For gradients
+\usepackage{pst-plot} % For axes
+\title{Final Project\\ \small{ on the Ford-Fulkerson Method}}
+\author{Tom Dooner, Brian Stack}
+\date{\today}
+\begin{document}
+\maketitle
+
+\subsection*{Introduction}
+
+The Ford-Fulkerson method is designed to calculate the maximum flow in a weighted directed graph or ``flow network''.  An intuitive definition of a flow network is a directed graph in which each edge has a non-negative capacity, and contains a source node and sink node where the flow must begin and end.  The Ford-Fulkerson method is \textbf{not} and algorithm, but rather as its name would suggest, a method that can be implemented by algorithms.  For an algorithm to implement the Ford-Fulkerson method, it must simply find each path between the source node and the sink node that can still accept more flow, and add the capacity of that path to the maximum flow.  For this project, we implemented the Edmonds-Karp algorithm, which is the most well known implementation of the Ford-Fulkerson method.  An implementation of the Ford-Fulkerson method is and Edmonds-Karp algorithm if it uses BFS to find the paths from the source to the sink. The time complexity of the algorithm is $O(VE^2)$.  Now we will attempt to show through experimentation that the Edmonds-Karp algorithm really does have that runtime.
+
+\subsection*{Tests}
+
+The method we used to test the algorithms runtime was to run it on problem instances from the size of 4 vertices up to 65536 vertices while keeping the edge count constant at 
+
+\end{document}
+
+
+
+
+

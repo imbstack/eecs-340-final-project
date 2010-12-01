@@ -12,8 +12,14 @@ public class EdmondsKarp {
 	long capacity;
 	DirectedSparseGraph<EdmondsVertex,EdmondsEdge> f;
 	EdmondsVertex source, sink;
+	boolean isTest;
 
 	EdmondsKarp(DirectedSparseGraph<EdmondsVertex, EdmondsEdge> f) {
+		this(f, false);
+	}
+
+	EdmondsKarp(DirectedSparseGraph<EdmondsVertex, EdmondsEdge> f, boolean isTest) {
+		this.isTest = isTest;
 		this.f = f;
 		for (EdmondsEdge i: f.getEdges()) {
 			i.setNewFlow(0);
@@ -21,11 +27,11 @@ public class EdmondsKarp {
 	}
 
 	public int maxFlow(EdmondsVertex source, EdmondsVertex sink, boolean runFull) {
-        int totalCapacity = 0;
+		int totalCapacity = 0;
 		// While there is a path with available capacity...
 		if (runFull){
-            capacity = findPath(source,sink);
-            System.out.println("Found path of capacity " + capacity + ". It's " + returnPath(sink));
+			capacity = findPath(source,sink);
+			if (!isTest){ System.out.println("Found path of capacity " + capacity + ". It's " + returnPath(sink));}
 			while (capacity > 0) {
 				// Travel backwards from the sink, adjusting the node capacities
 				//  as we go back.
@@ -34,19 +40,21 @@ public class EdmondsKarp {
 					f.findEdge(currentV.parentNode, currentV).addFlow((int)capacity);
 					currentV = currentV.parentNode;
 				}
-                totalCapacity += capacity;
-				if (capacity > 0){
-					System.out.println("Found path of capacity " + capacity + ". It's " + returnPath(sink));
+				totalCapacity += capacity;
+				if (!isTest){
+					if (capacity > 0){
+						System.out.println("Found path of capacity " + capacity + ". It's " + returnPath(sink));
+					}
+					else{
+						System.out.println("Finished");
+					}
 				}
-				else{
-					System.out.println("Finished");
-				}
-                capacity = findPath(source,sink);
+				capacity = findPath(source,sink);
 				//System.out.println(capacity);
 			}
 		}
 		else{
-            capacity = findPath(source,sink);
+			capacity = findPath(source,sink);
 			if (capacity > 0){
 				currentV = sink;
 				while (currentV != source) {
@@ -54,8 +62,8 @@ public class EdmondsKarp {
 					currentV = currentV.parentNode;
 				}
 				System.out.println("Found path of capacity " + capacity + ". It's " + returnPath(sink));
-            } else {
-					System.out.println("Finished");
+			} else {
+				System.out.println("Finished");
 			}
 		}
 		Collection<EdmondsVertex> vertices;
@@ -113,7 +121,7 @@ public class EdmondsKarp {
 			else{
 				end = current.name + "," + end;
 			}
-				current = current.parentNode;
+			current = current.parentNode;
 		}
 		return "{" + end;
 	}
