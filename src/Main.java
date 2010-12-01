@@ -108,8 +108,8 @@ class Main{
 		};
 		Transformer<EdmondsEdge, Stroke> edgeStrokeTransformer = new Transformer<EdmondsEdge, Stroke>() {
 			public Stroke transform(EdmondsEdge edge) {
-				float wid = 6*(float)edge.capacity/EdmondsEdge.maxCapacity;
-				return new BasicStroke(wid, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f);
+				float wid = 4*(float)edge.capacity/EdmondsEdge.maxCapacity;
+				return new BasicStroke(wid, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
 			}
 		};
 		vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
