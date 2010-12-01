@@ -20,8 +20,10 @@ import java.awt.event.ActionListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import edu.uci.ics.jung.algorithms.filters.EdgePredicateFilter;
+import edu.uci.ics.jung.visualization.annotations.*;
 import org.apache.commons.collections15.Predicate;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
+import java.awt.geom.Point2D;
 
 class Main{
 	static SimpleGraphView sgv;
@@ -29,27 +31,35 @@ class Main{
 	static VisualizationViewer<EdmondsVertex, EdmondsEdge> vv;
 	static JFrame frame;
 	static int graphDims;
+    static ProgressDisplay pd;
+    static ControlPanel controls;
+    static final Dimension SIZE_OF_WINDOW = new Dimension(1000,730);
+    static final Dimension SIZE_OF_GRAPH = new Dimension(900,650);
 	public static void main(String[] args){
 		graphDims = 3;
-		frame = new JFrame("Simple Graph View");
-		ControlPanel controls = new ControlPanel();
+		frame = new JFrame("Ford Fulkerson Method (Edmonds Karp Implementation) Demo");
+        pd = new ProgressDisplay();
+		controls = new ControlPanel(pd);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.PAGE_AXIS));
+        frame.getContentPane().setBackground(new Color(25,25,35));
 		frame.getContentPane().add(controls);
+        frame.getContentPane().add(pd);
 		renderGraph();
 		frame.getContentPane().add(vv);
 		frame.pack();
-		frame.setLocation(200,200);
+		frame.setLocation(12,0);
+        frame.setSize(SIZE_OF_WINDOW);
 		frame.setVisible(true);
 	}
 	public static void renderGraph() {
 		sgv = new SimpleGraphView(); //We create our graph in here
 		// The Layout<V, E> is parameterized by the vertex and edge types
 		layout = new ISOMLayout(sgv.g);
-		layout.setSize(new Dimension(1024,768)); // sets the initial size of the space
+		layout.setSize(SIZE_OF_GRAPH); // sets the initial size of the space
 		// The BasicVisualizationServer<V,E> is parameterized by the edge types
 		vv = new VisualizationViewer<EdmondsVertex, EdmondsEdge>(layout);
-		vv.setPreferredSize(new Dimension(1024,768)); //Sets the viewing area size
+		vv.setPreferredSize(SIZE_OF_GRAPH); //Sets the viewing area size
 		final Color slate = new Color(25,25,35);
 		Transformer<EdmondsVertex,Paint> vertexPaint = new Transformer<EdmondsVertex,Paint>() {
 			public Paint transform(EdmondsVertex vert) {
@@ -102,16 +112,23 @@ class Main{
 		DefaultModalGraphMouse gm = new DefaultModalGraphMouse();
 		gm.setMode(ModalGraphMouse.Mode.TRANSFORMING);
 		vv.setGraphMouse(gm);
+//        AnnotationManager am = new AnnotationManager(vv.getRenderContext());
+//        am.add(Annotation.Layer.UPPER,(new Annotation("Testing",Annotation.Layer.UPPER,vv.getForeground(),false,new Point(0,0))));
 		vv.revalidate();
 		vv.repaint();
+        Main.controls.step.setEnabled(true);
 	}
 	static class ControlPanel extends JPanel {
 		JButton maxFlow;
 		JButton reset;
 		JButton step;
 		JButton newGraph;
+        JPanel debug;
+
 		JSlider graphSize;
-		ControlPanel() {
+        final ProgressDisplay pd;
+		ControlPanel(final ProgressDisplay pd) {
+            this.pd = pd;
 			maxFlow = new JButton("Compute Max Flow");
 			reset = new JButton("Reset");
 			step = new JButton("Step");
@@ -120,7 +137,9 @@ class Main{
 
 			maxFlow.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					sgv.performEdmondsKarp();
+					int maxFlow = sgv.performEdmondsKarp();
+                    Main.pd.showFinal(maxFlow);
+                    Main.controls.step.setEnabled(false);
 					//vv.update(frame.getGraphics());
 					vv.repaint();
 				}
@@ -128,6 +147,11 @@ class Main{
 
 			reset.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+                    Main.controls.step.setEnabled(true);
+                    Main.pd.reset();
+                    sgv.reset();
+                    vv.updateUI();
+                    vv.repaint();
 					//sgv.performEdmondsKarp();
 				}
 			});
@@ -142,6 +166,7 @@ class Main{
 					//sgv.generateNewGraph();
 					frame.setVisible(false);
 					frame.getContentPane().remove(vv);
+                    Main.pd.reset();
 					renderGraph();
 					frame.getContentPane().add(vv);
 					frame.setVisible(true);
@@ -166,7 +191,64 @@ class Main{
 			this.add(graphSize);
 		}
 	}
-
+    static class ProgressDisplay extends JPanel {
+        final TJLabel awaitingText = new TJLabel("Waiting To Begin...");
+        final TJLabel executingNow = new TJLabel("Current Status: ");
+        final TJLabel foundPath    = new TJLabel("Found Path ");
+        final TJLabel withCapacity = new TJLabel(" with capacity ");
+        final TJLabel finished     = new TJLabel("Finished, with max flow of ");
+        int totalCapacity;
+        static class TJLabel extends JLabel {
+            TJLabel(String contents) {
+                super(contents);
+                this.setFont(new Font("sans",Font.BOLD,20));
+                this.setForeground(new Color(240,240,230));
+            }
+        }
+        ProgressDisplay() {
+            int totalCapacity = 0;
+            this.setBackground(new Color(25,25,35));
+            this.setForeground(new Color(240,240,230));
+            this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+            this.add(awaitingText);
+        }
+        public void takeStep(String path, int capacity) {
+            totalCapacity += capacity;
+            TJLabel pathLabel = new TJLabel(path);
+            TJLabel capacityLabel = new TJLabel((new Integer(capacity)).toString());
+            this.removeAll();
+            this.add(executingNow);
+            if (capacity > 0) {
+                this.add(foundPath);
+                this.add(pathLabel);
+                this.add(withCapacity);
+                this.add(capacityLabel);
+            } else {
+                TJLabel totalCapacityLabel = new TJLabel((new Integer(totalCapacity).toString()));
+                this.add(finished);
+                this.add(totalCapacityLabel);
+                Main.controls.step.setEnabled(false);
+            }
+            this.update();
+        }
+        public void showFinal(int capacity) {
+            this.removeAll();
+            TJLabel totalCapacityLabel = new TJLabel((new Integer(capacity).toString()));
+            this.add(finished);
+            this.add(totalCapacityLabel);
+            this.update();
+        }
+        public void reset() {
+            totalCapacity = 0;
+            this.removeAll();
+            this.add(awaitingText);
+            this.update();
+        }
+        public void update() {
+            this.updateUI();
+            this.repaint();
+        }
+    }
 	public static int getDims(){
 		return graphDims;
 	}
@@ -255,10 +337,12 @@ class SimpleGraphView{
 	public void generateNewGraph() {
 		this.generateGraph();
 	}
-	public void performEdmondsKarp() {
+	public int performEdmondsKarp() {
 		//Lets now try our edmonds-karp algorithm... fingers crossed
 		ek = new EdmondsKarp(g);
-		ek.maxFlow(vertices[s], vertices[t], true);
+		int maxFlow = ek.maxFlow(vertices[s], vertices[t], true);
+        Main.pd.showFinal(maxFlow);
+        return maxFlow;
 	}
 
 	public void performEdmondsStep() {
@@ -266,5 +350,16 @@ class SimpleGraphView{
 			ek = new EdmondsKarp(g);
 		}
 		ek.maxFlow(vertices[s], vertices[t], false);
+        Main.pd.takeStep(ek.returnPath(vertices[t]), (int)ek.capacity);
 	}
+    public void reset() {
+        for(EdmondsEdge oneEdge: g.getEdges()) {
+            oneEdge.setNewFlow(0);
+        }
+        for(EdmondsVertex oneVertex: g.getVertices()) {
+            oneVertex.parentNode = null;
+            oneVertex.pathCapacityToNode = 4294967296L;
+        }
+        EdmondsEdge.maxUsed = 0;
+    }
 }
