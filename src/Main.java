@@ -30,6 +30,10 @@ class Main{
 	static JFrame frame;
 	static int graphDims;
 	public static void main(String[] args){
+		if ( args.length > 0 && args[0].equals("test")){
+			System.out.println("Begin Tests:");
+		}
+		else{
 		graphDims = 3;
 		frame = new JFrame("Simple Graph View");
 		ControlPanel controls = new ControlPanel();
@@ -41,6 +45,7 @@ class Main{
 		frame.pack();
 		frame.setLocation(200,200);
 		frame.setVisible(true);
+		}
 	}
 	public static void renderGraph() {
 		sgv = new SimpleGraphView(); //We create our graph in here

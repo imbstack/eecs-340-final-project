@@ -1,96 +1,103 @@
 <?xml version="1.0"?>
 <project name="eecs340" default="dist" basedir=".">
-    <description>
-        Two implementations of the Ford-Fulkerson method.
-    </description>
-  <!-- set global properties for this build -->
-  <property name="src" location="src"/>
-  <property name="build" location="build"/>
-  <property name="dist"  location="dist"/>
-  <property name="main-class" value="Main"/>
-  <property name="lib" value="lib"/>
+	<description>
+		Two implementations of the Ford-Fulkerson method.
+	</description>
+	<!-- set global properties for this build -->
+	<property name="src" location="src"/>
+	<property name="build" location="build"/>
+	<property name="dist"  location="dist"/>
+	<property name="main-class" value="Main"/>
+	<property name="lib" value="lib"/>
 
 
- <pathconvert property="libs.project" pathsep=" ">
-    <mapper>
-      <chainedmapper>
+	<pathconvert property="libs.project" pathsep=" ">
+		<mapper>
+			<chainedmapper>
 
-        <!-- remove absolute path -->
-        <flattenmapper />
+				<!-- remove absolute path -->
+				<flattenmapper />
 
-        <!-- add lib/ prefix -->
-        <globmapper from="*" to="lib/*" />
-      </chainedmapper>
-    </mapper>
+				<!-- add lib/ prefix -->
+				<globmapper from="*" to="lib/*" />
+			</chainedmapper>
+		</mapper>
 
-    <path>
+		<path>
 
-      <!-- lib.home contains all jar files, in several subdirectories -->
-      <fileset dir="${lib}">
-        <include name="**/*.jar" />
-      </fileset>
-    </path>
-  </pathconvert>
-
-
-      <path id="classpath">
-	 <fileset dir="${lib}" includes="**/*.jar"/>
-      </path>
+			<!-- lib.home contains all jar files, in several subdirectories -->
+			<fileset dir="${lib}">
+				<include name="**/*.jar" />
+			</fileset>
+		</path>
+	</pathconvert>
 
 
-
-  <target name="init">
-    <!-- Create the time stamp -->
-    <tstamp/>
-    <!-- Create the build directory structure used by compile -->
-    <mkdir dir="${build}"/>
-  </target>
-
-  <target name="compile" depends="init"
-        description="compile the source " >
-    <!-- Compile the java code from ${src} into ${build} -->
-    <javac srcdir="${src}" destdir="${build}" classpathref="classpath" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
-	    <compilerarg value="-Xlint:none"/> 
-    </javac>
-  </target>
-
-<target name="compile_w_debug" depends="init"
-        description="compile the source " >
-    <!-- Compile the java code from ${src} into ${build} -->
-    <javac srcdir="${src}" destdir="${build}" classpathref="classpath" includeantruntime="false">
-	    <compilerarg value="-Xlint:none -g"/> 
-    </javac>
-  </target>
+	<path id="classpath">
+		<fileset dir="${lib}" includes="**/*.jar"/>
+	</path>
 
 
-  <target name="dist" depends="compile"
-        description="generate the distribution" >
-    <!-- Create the distribution directory -->
-    <mkdir dir="${dist}/lib"/>
-    <copy todir="${dist}/lib">
-	    <fileset dir="${lib}">
-		<include name="**/*.jar"/>
-	    </fileset>
-    </copy>
-    <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-    <jar jarfile="${dist}/ford-fulkerson.jar" basedir="${build}">
-	    <manifest>
-		    <attribute name="Main-Class" value="${main-class}"/>
-		    <attribute name="Class-Path" value="${libs.project}"/>
-	    </manifest>
-    </jar>
-  </target>
 
-  <target name="run" depends="dist">
-	  <java jar="${dist}/ford-fulkerson.jar" fork="true">
-       	  </java>
-  </target>
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp/>
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build}"/>
+	</target>
 
-  <target name="clean"
-        description="clean up" >
-    <!-- Delete the ${build} and ${dist} directory trees -->
-    <delete dir="${build}"/>
-    <delete dir="${dist}"/>
-  </target>
+	<target name="compile" depends="init"
+		description="compile the source " >
+		<!-- Compile the java code from ${src} into ${build} -->
+		<javac srcdir="${src}" destdir="${build}" classpathref="classpath" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
+			<compilerarg value="-Xlint:none"/> 
+		</javac>
+	</target>
+
+	<target name="compile_w_debug" depends="init"
+		description="compile the source " >
+		<!-- Compile the java code from ${src} into ${build} -->
+		<javac srcdir="${src}" destdir="${build}" classpathref="classpath" includeantruntime="false">
+			<compilerarg value="-Xlint:none -g"/> 
+		</javac>
+	</target>
+
+
+	<target name="dist" depends="compile"
+		description="generate the distribution" >
+		<!-- Create the distribution directory -->
+		<mkdir dir="${dist}/lib"/>
+		<copy todir="${dist}/lib">
+			<fileset dir="${lib}">
+				<include name="**/*.jar"/>
+			</fileset>
+		</copy>
+		<!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+		<jar jarfile="${dist}/ford-fulkerson.jar" basedir="${build}">
+			<manifest>
+				<attribute name="Main-Class" value="${main-class}"/>
+				<attribute name="Class-Path" value="${libs.project}"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="run" depends="dist">
+		<java jar="${dist}/ford-fulkerson.jar" fork="true">
+		</java>
+	</target>
+
+	<target name="test" depends="dist">
+		<java jar="${dist}/ford-fulkerson.jar" fork="true">
+			<arg value="test" />
+		</java>
+	</target>
+
+
+	<target name="clean"
+		description="clean up" >
+		<!-- Delete the ${build} and ${dist} directory trees -->
+		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+	</target>
 </project>
 
