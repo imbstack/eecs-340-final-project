@@ -115,7 +115,7 @@ public class EdmondsKarp {
 			else{
 				end = current.name + " → " + end;
 			}
-				current = current.parentNode;
+			current = current.parentNode;
 		}
 		return "{" + end;
 	}

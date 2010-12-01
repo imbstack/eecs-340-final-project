@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2010.10.7)  30 NOV 2010 18:47
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2010.10.7)  30 NOV 2010 19:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -268,12 +268,12 @@ File: umsb.fd 2009/06/22 v3.00 AMS symbols B
 
 ] [1] (./report.aux) ) 
 Here is how much of TeX's memory you used:
- 3681 strings out of 495062
- 43588 string characters out of 1182644
- 119438 words of memory out of 3000000
- 6812 multiletter control sequences out of 15000+50000
- 8883 words of font info for 34 fonts, out of 3000000 for 9000
+ 3696 strings out of 495062
+ 43742 string characters out of 1182644
+ 120438 words of memory out of 3000000
+ 6823 multiletter control sequences out of 15000+50000
+ 11197 words of font info for 44 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
- 31i,6n,52p,258b,189s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 31i,6n,52p,1138b,189s stack positions out of 5000i,500n,10000p,200000b,50000s
 
-Output written on report.dvi (2 pages, 900 bytes).
+Output written on report.dvi (2 pages, 2568 bytes).

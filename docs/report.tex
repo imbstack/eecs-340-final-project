@@ -17,7 +17,15 @@
 \date{\today}
 \begin{document}
 \maketitle
-lol
+
+\subsection*{Introduction}
+
+The Ford-Fulkerson method is designed to calculate the maximum flow in a weighted directed graph or ``flow network''.  An intuitive definition of a flow network is a directed graph in which each edge has a non-negative capacity, and contains a source node and sink node where the flow must begin and end.  The Ford-Fulkerson method is \textbf{not} and algorithm, but rather as its name would suggest, a method that can be implemented by algorithms.  For an algorithm to implement the Ford-Fulkerson method, it must simply find each path between the source node and the sink node that can still accept more flow, and add the capacity of that path to the maximum flow.  For this project, we implemented the Edmonds-Karp algorithm, which is the most well known implementation of the Ford-Fulkerson method.  An implementation of the Ford-Fulkerson method is and Edmonds-Karp algorithm if it uses BFS to find the paths from the source to the sink. The time complexity of the algorithm is $O(VE^2)$.  Now we will attempt to show through experimentation that the Edmonds-Karp algorithm really does have that runtime.
+
+\subsection*{Tests}
+
+
+
 \end{document}
 
 
