@@ -21,10 +21,11 @@ public class EdmondsKarp {
 	}
 
 	public int maxFlow(EdmondsVertex source, EdmondsVertex sink, boolean runFull) {
+        int totalCapacity = 0;
 		// While there is a path with available capacity...
-		capacity = findPath(source,sink);
-		System.out.println("Found path of capacity " + capacity + ". It's " + returnPath(sink));
 		if (runFull){
+            capacity = findPath(source,sink);
+            System.out.println("Found path of capacity " + capacity + ". It's " + returnPath(sink));
 			while (capacity > 0) {
 				// Travel backwards from the sink, adjusting the node capacities
 				//  as we go back.
@@ -33,35 +34,32 @@ public class EdmondsKarp {
 					f.findEdge(currentV.parentNode, currentV).addFlow((int)capacity);
 					currentV = currentV.parentNode;
 				}
-				capacity = findPath(source,sink);
+                totalCapacity += capacity;
 				if (capacity > 0){
 					System.out.println("Found path of capacity " + capacity + ". It's " + returnPath(sink));
 				}
 				else{
 					System.out.println("Finished");
 				}
+                capacity = findPath(source,sink);
 				//System.out.println(capacity);
 			}
 		}
 		else{
+            capacity = findPath(source,sink);
 			if (capacity > 0){
 				currentV = sink;
 				while (currentV != source) {
 					f.findEdge(currentV.parentNode, currentV).addFlow((int)capacity);
 					currentV = currentV.parentNode;
 				}
-				capacity = findPath(source,sink);
-				if (capacity > 0){
-					System.out.println("Found path of capacity " + capacity + ". It's " + returnPath(sink));
-				}
-				else{
+				System.out.println("Found path of capacity " + capacity + ". It's " + returnPath(sink));
+            } else {
 					System.out.println("Finished");
-				}
-				//System.out.println(capacity);
 			}
 		}
 		Collection<EdmondsVertex> vertices;
-		return 1;
+		return totalCapacity;
 	}
 	/**
 	 * Finds a path with remaining capacity between s and t.
@@ -113,7 +111,7 @@ public class EdmondsKarp {
 				end = current.name + "}";
 			}
 			else{
-				end = current.name + " → " + end;
+				end = current.name + "," + end;
 			}
 				current = current.parentNode;
 		}
